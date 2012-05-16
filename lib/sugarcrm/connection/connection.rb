@@ -84,13 +84,27 @@ module SugarCRM; class Connection
     if max_retry == 0
       raise SugarCRM::RetryLimitExceeded, "SugarCRM::Connection Errors: \n#{@errors.reverse.join "\n\s\s"}"
     end
-    @request  = SugarCRM::Request.new(@url, method, json, @options[:debug])
+    @request  = SugarCRM::Request.new(@url, method, json, @options[:debug], @options[:basic_auth])
     # Send Ze Request
     begin
       if @request.length > 3900
-        @response = @connection.post(@url.path, @request)
+
+        request = Net::HTTP::Post.new(@url.path)
+        unless @request.basic_auth.blank?
+           request.basic_auth(@request.basic_auth[:user], @request.basic_auth[:pw])
+         end
+        request.set_form_data(@request.to_h)
+        @response = @connection.request(request)
+        #@response = @connection.post(@url.path, @request)
       else
-        @response = @connection.get(@url.path.dup + "?" + @request.to_s)
+        request = Net::HTTP::Get.new("#{@url.path}?#{@request}")
+        unless @request.basic_auth.blank?
+           request.basic_auth(@request.basic_auth[:user], @request.basic_auth[:pw])
+         end
+        @response = @connection.request(request)
+
+
+        #@response = @connection.get(@url.path.dup + "?" + @request.to_s)
       end
       return handle_response
     # Timeouts are usually a server side issue

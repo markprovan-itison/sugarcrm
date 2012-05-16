@@ -30,7 +30,11 @@ module SugarCRM; class Session
     pool_options = parse_connection_pool_options(hash)
     options = opts
     (options = {:connection_pool => pool_options}.merge(opts)) if pool_options.size > 0
-    
+
+    if opts[:basic_auth_user] && opts[:basic_auth_pw]
+      options = options.merge(:basic_auth =>{:user => opts[:basic_auth_user], :pw => opts[:basic_auth_pw]})
+    end
+
     begin
       session = self.new(hash[:base_url], hash[:username], hash[:password], options)
     rescue MissingCredentials => e

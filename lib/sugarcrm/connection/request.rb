@@ -4,11 +4,13 @@ module SugarCRM; class Request
   attr :method, true
   attr :json, true
   attr :http_method
+  attr :basic_auth
 
-  def initialize(url, method, json, debug=false)
+  def initialize(url, method, json, debug=false, basic_auth ={})
     @url      = url
     @method   = method
     @json     = escape(json)
+    @basic_auth = basic_auth
     @request  = 'method=' << @method.to_s
     @request << '&input_type=JSON'
     @request << '&response_type=JSON'
@@ -43,6 +45,15 @@ module SugarCRM; class Request
     self.to_s.length
   end
   
+  def to_h
+    {
+      'method' => @method.to_s,
+      'input_type' => 'JSON',
+      'response_type' => 'JSON',
+      'rest_data' => @json
+    }
+  end
+
   def to_s
     @request
   end

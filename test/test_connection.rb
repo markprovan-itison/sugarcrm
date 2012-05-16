@@ -9,5 +9,14 @@ class TestConnection < ActiveSupport::TestCase
     should "create sub-classes by module name" do
       assert SugarCRM.session.namespace_const.const_defined? "User"
     end
+    should "connect with basic auth" do
+      #connection = SugarCRM::Connection.new("http://localhost", "user", "pw", {:basic_auth =>{:user => 'basic_auth_user', :pw => 'basic_auth_pw'}})
+      SugarCRM.session.disconnect
+      SugarCRM::Session.from_file(CONFIG_PATH, {:basic_auth =>{:user => 'basic_auth_user', :pw => 'basic_auth_pw'}})
+      SugarCRM.connection.connect!
+      assert_equal SugarCRM.connection.request.basic_auth[:user], 'basic_auth_user'
+      assert_equal SugarCRM.connection.request.basic_auth[:pw], 'basic_auth_pw'
+    end
+
   end
 end
