@@ -87,7 +87,7 @@ module SugarCRM; class Connection
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug], @options[:basic_auth])
     # Send Ze Request
     begin
-      if @request.length > 3900
+      if @request.length > 7900 # ugly fix for borken POST request
 
         request = Net::HTTP::Post.new(@url.path)
         unless @request.basic_auth.blank?
