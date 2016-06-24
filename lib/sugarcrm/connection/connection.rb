@@ -87,7 +87,10 @@ module SugarCRM; class Connection
     @request  = SugarCRM::Request.new(@url, method, json, @options[:debug], @options[:basic_auth])
     # Send Ze Request
     begin
-      if @request.length > 7900 # ugly fix for borken POST request
+      if @request.length > 63900 # ugly fix for borken POST request
+        # nginx config should be:
+        # client_header_buffer_size 64k;
+        # large_client_header_buffers 4 64k;
 
         request = Net::HTTP::Post.new(@url.path)
         unless @request.basic_auth.blank?
